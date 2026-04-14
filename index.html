@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketing Dashboard — Diamond Plus</title>
+<style>
+:root {
+  --brand: #5C2450;
+  --brand-light: #7a3a6c;
+  --brand-dark: #3e1836;
+  --accent: #e6a817;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #6366f1;
+  --bg: #f4f5f7;
+  --card: #ffffff;
+  --text: #1e1e2f;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --radius: 12px;
+}
+[data-theme="dark"] {
+  --bg: #0f1117;
+  --card: #1a1c25;
+  --text: #e4e4e7;
+  --text-muted: #9ca3af;
+  --border: #2d2f3a;
+  --brand-light: #9b6490;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* TOP NAV */
+.topnav {
+  background: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand) 100%);
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 16px rgba(0,0,0,.25);
+}
+.topnav-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 56px;
+}
+.topnav-brand {
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: .3px;
+  white-space: nowrap;
+  margin-right: 32px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.topnav-brand span { font-size: 11px; font-weight: 400; opacity: .65; }
+.topnav-links {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex: 1;
+}
+.topnav-links::-webkit-scrollbar { display: none; }
+.topnav-links a {
+  color: rgba(255,255,255,.75);
+  text-decoration: none;
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+  transition: all .18s;
+}
+.topnav-links a:hover {
+  background: rgba(255,255,255,.12);
+  color: #fff;
+}
+.topnav-links a.active {
+  background: rgba(255,255,255,.18);
+  color: #fff;
+}
+.topnav-right {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding-left: 16px;
+}
+.theme-toggle {
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.2);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background .2s;
+  white-space: nowrap;
+}
+.theme-toggle:hover { background: rgba(255,255,255,.22); }
+
+/* MAIN */
+.main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 36px 32px 48px;
+}
+
+/* PAGE HEADER */
+.page-header {
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid var(--border);
+}
+.page-header h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--brand);
+  margin-bottom: 6px;
+}
+[data-theme="dark"] .page-header h1 { color: var(--brand-light); }
+.page-header .subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* KPI CARDS */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 18px;
+  margin-bottom: 32px;
+}
+.kpi-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 4px; height: 100%;
+}
+.kpi-card.purple::before { background: var(--brand); }
+.kpi-card.gold::before { background: var(--accent); }
+.kpi-card.red::before { background: var(--danger); }
+.kpi-card.green::before { background: var(--success); }
+.kpi-card.blue::before { background: var(--info); }
+.kpi-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .7px; font-weight: 600; }
+.kpi-value { font-size: 30px; font-weight: 800; margin: 6px 0 2px; }
+.kpi-sub { font-size: 12.5px; color: var(--text-muted); }
+
+/* SECTION */
+.section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.section-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-title svg { width: 20px; height: 20px; color: var(--brand); flex-shrink: 0; }
+[data-theme="dark"] .section-title svg { color: var(--brand-light); }
+
+/* SECTION ANCHOR OFFSETS */
+.section-anchor {
+  scroll-margin-top: 72px;
+}
+
+/* CHARTS */
+.chart-container { width: 100%; overflow-x: auto; }
+.chart-container svg { display: block; margin: 0 auto; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+
+/* DONUT */
+.donut-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+.donut-stats { min-width: 160px; }
+.donut-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13.5px;
+}
+.donut-stat:last-child { border-bottom: none; }
+.donut-stat .dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; flex-shrink: 0; }
+.donut-stat-left { display: flex; align-items: center; }
+.donut-stat-right { font-weight: 700; }
+
+/* LEGEND */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 16px;
+  justify-content: center;
+}
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-muted); }
+.legend-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+
+/* PROGRESS BARS */
+.prog-wrap { margin: 8px 0; }
+.prog-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+.prog-track { width: 100%; height: 22px; background: var(--border); border-radius: 6px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 10px; color: #fff; font-size: 12px; font-weight: 600; min-width: 4px; }
+
+/* TABLE */
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+.data-table thead th {
+  background: var(--brand);
+  color: #fff;
+  padding: 11px 14px;
+  text-align: right;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: .3px;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+.data-table thead th:first-child { text-align: left; border-radius: 8px 0 0 0; }
+.data-table thead th:last-child { border-radius: 0 8px 0 0; }
+.data-table thead th:hover { background: var(--brand-light); }
+.data-table tbody tr { transition: background .15s; }
+.data-table tbody tr:hover { background: rgba(92,36,80,.06); }
+[data-theme="dark"] .data-table tbody tr:hover { background: rgba(255,255,255,.04); }
+.data-table tbody td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+}
+.data-table tbody td:first-child { text-align: left; font-weight: 600; }
+.data-table tfoot td {
+  padding: 10px 14px;
+  border-top: 2px solid var(--brand);
+  font-weight: 700;
+  text-align: right;
+  font-size: 13px;
+}
+.data-table tfoot td:first-child { text-align: left; }
+
+/* BADGES */
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-green { background: #dcfce7; color: #15803d; }
+.badge-blue { background: #dbeafe; color: #1d4ed8; }
+.badge-purple { background: #f3e8ff; color: #7e22ce; }
+.badge-gold { background: #fef3c7; color: #92400e; }
+.badge-gray { background: #f3f4f6; color: #6b7280; }
+[data-theme="dark"] .badge-green { background: #14532d; color: #86efac; }
+[data-theme="dark"] .badge-blue { background: #1e3a5f; color: #93c5fd; }
+[data-theme="dark"] .badge-purple { background: #3b0764; color: #d8b4fe; }
+[data-theme="dark"] .badge-gold { background: #451a03; color: #fcd34d; }
+[data-theme="dark"] .badge-gray { background: #374151; color: #d1d5db; }
+
+/* RECO CARDS */
+.reco-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.reco-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+}
+.reco-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
+.reco-card.positive::before { background: var(--success); }
+.reco-card.warning::before { background: var(--warning); }
+.reco-card.info::before { background: var(--info); }
+.reco-title { font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+.reco-text { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+/* STAT BOXES */
+.stat-boxes { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.stat-box {
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 14px;
+  text-align: center;
+}
+.stat-box-val { font-size: 22px; font-weight: 800; color: var(--brand); }
+[data-theme="dark"] .stat-box-val { color: var(--brand-light); }
+.stat-box-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
+
+/* SORT INDICATOR */
+th.sort-asc::after { content: ' ↑'; }
+th.sort-desc::after { content: ' ↓'; }
+
+/* GA4 CARDS */
+.ga4-platform-card { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.ga4-card-header { padding: 14px 18px; color: #fff; }
+.ga4-card-body { padding: 16px 18px; }
+
+/* FOOTER */
+.footer {
+  text-align: center;
+  padding: 28px 0 16px;
+  font-size: 12px;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .main { padding: 24px 16px 40px; }
+  .two-col { grid-template-columns: 1fr; }
+  .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+  .topnav-brand span { display: none; }
+  .topnav-inner { padding: 0 16px; gap: 0; }
+  .topnav-brand { margin-right: 12px; font-size: 13px; }
+  .topnav-links a { font-size: 11.5px; padding: 5px 8px; }
+}
+@media (max-width: 600px) {
+  .data-table { font-size: 11.5px; }
+  .data-table thead th, .data-table tbody td { padding: 8px 10px; }
+  .topnav-links { display: none; }
+  .page-header h1 { font-size: 22px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAVIGATION -->
+<nav class="topnav">
+  <div class="topnav-inner">
+    <div class="topnav-brand">
+      📢 Marketing Dashboard
+      <span>Diamond Plus · Království TianDe</span>
+    </div>
+    <div class="topnav-links" id="topLinks">
+      <a href="#kpi">KPI Přehled</a>
+      <a href="#spend">Platformy</a>
+      <a href="#trend">Týdenní trend</a>
+      <a href="#campaigns">Kampaně</a>
+      <a href="#ga4">GA4 Atribuce</a>
+      <a href="#reco">Doporučení</a>
+    </div>
+    <div class="topnav-right">
+      <button class="theme-toggle" onclick="toggleTheme()">🌙 Tmavý režim</button>
+    </div>
+  </div>
+</nav>
+
+<main class="main">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header" id="kpi">
+    <h1>Marketing Dashboard — Diamond Plus</h1>
+    <div class="subtitle">Výkonnost reklam &nbsp;·&nbsp; Q1 2026 + duben &nbsp;·&nbsp; META + Google Ads + GA4</div>
+  </div>
+
+  <!-- KPI CARDS -->
+  <div class="kpi-grid section-anchor">
+    <div class="kpi-card purple">
+      <div class="kpi-label">Celkový spend</div>
+      <div class="kpi-value">456 981</div>
+      <div class="kpi-sub">CZK · META + Google · CZ + SK</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Celkové konverze</div>
+      <div class="kpi-value">9 787</div>
+      <div class="kpi-sub">META CZ: 1 608 · META SK: 264 · Google CZ: 7 915</div>
+    </div>
+    <div class="kpi-card gold">
+      <div class="kpi-label">Průměrný CPC</div>
+      <div class="kpi-value">2,89 Kč</div>
+      <div class="kpi-sub">META CZ: 3,00 Kč · Google CZ: 2,37 Kč · Google SK: 4,23 Kč</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">META ROAS (CZ)</div>
+      <div class="kpi-value">9,55×</div>
+      <div class="kpi-sub">Tržby 2,22M Kč · META SK: 7,31×</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Průměrné CPA</div>
+      <div class="kpi-value">46,7 Kč</div>
+      <div class="kpi-sub">META CZ: 144 Kč · Google CZ: 13,85 Kč</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Celková zobrazení</div>
+      <div class="kpi-value">2,63M</div>
+      <div class="kpi-sub">META CZ: 1,68M · META SK: 727K · Google CZ: 55K</div>
+    </div>
+  </div>
+
+  <!-- MANAGEMENT COMMENTS -->
+  <div style="margin:0 0 28px;display:flex;gap:20px;flex-wrap:wrap;">
+    <div style="flex:1;min-width:320px;background:#FFF8E7;border-left:4px solid #D4A017;padding:16px 20px;border-radius:8px;">
+      <div style="font-weight:700;font-size:13px;color:#8B6914;margin-bottom:6px;">💼 Komentář ředitele — Marketingový ředitel (CMO)</div>
+      <div style="font-size:14px;color:#333;line-height:1.5;">META reportuje ROAS 9,55×, avšak GA4 ukazuje reálné atribuce pouze na úrovni přibližně 3,2× — tento rozdíl není měřicí chybou, je to systematická over-atribuce ze strany META. Plánujeme reklamní výdaje na základě čísel, která mohou být trojnásobně optimistická. Google Ads mezitím vykazuje výrazně lepší výkonnost i nižší CPA.</div>
+      <div style="font-size:11px;color:#999;margin-top:8px;">Marketingový ředitel (CMO) · 14. dubna 2026</div>
+    </div>
+    <div style="flex:1;min-width:320px;background:#F0F4FF;border-left:4px solid #3B5BDB;padding:16px 20px;border-radius:8px;">
+      <div style="font-weight:700;font-size:13px;color:#2B4ACB;margin-bottom:6px;">🏛 Souhrn pro Board</div>
+      <div style="font-size:14px;color:#333;line-height:1.5;">Nesoulad META ROAS (9,55×) vs. GA4 atribuce (≈3,2×) zpochybňuje základ pro rozhodování o reklamním rozpočtu. Skutečný výnos na korunu investovanou do META je pravděpodobně výrazně pod reportovanou hodnotou. Board by měl přezkoumat alokaci reklamních výdajů a zvážit přesun části rozpočtu ve prospěch Google Ads.</div>
+      <div style="font-size:11px;color:#999;margin-top:8px;">Sestaveno k 14. 4. 2026</div>
+    </div>
+  </div>
+
+  <!-- SPEND BREAKDOWN -->
+  <div class="two-col section-anchor" id="spend">
+    <div class="section">
+      <div class="section-title">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        META vs Google — výdaje Q1 2026
+      </div>
+      <div class="donut-wrapper">
+        <svg id="donutMeta" width="180" height="180" viewBox="0 0 180 180"></svg>
+        <div class="donut-stats">
+          <div class="donut-stat">
+            <div class="donut-stat-left"><div class="dot" style="background:#5C2450"></div>META Ads</div>
+            <div class="donut-stat-right">297 668 Kč</div>
+          </div>
+          <div class="donut-stat">
+            <div class="donut-stat-left"><div class="dot" style="background:#e6a817"></div>Google Ads</div>
+            <div class="donut-stat-right">159 313 Kč</div>
+          </div>
+          <div class="donut-stat">
+            <div class="donut-stat-left"><div class="dot" style="background:#6366f1"></div>Celkem</div>
+            <div class="donut-stat-right">456 981 Kč</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/></svg>
+        Výdaje dle platformy
+      </div>
+      <div style="margin-top:8px">
+        <div class="prog-wrap">
+          <div class="prog-label"><span>META CZ</span><span style="font-weight:700">232 188 Kč (50,8 %)</span></div>
+          <div class="prog-track"><div class="prog-fill" style="width:50.8%;background:#5C2450">META CZ</div></div>
+        </div>
+        <div class="prog-wrap">
+          <div class="prog-label"><span>Google CZ</span><span style="font-weight:700">109 657 Kč (24,0 %)</span></div>
+          <div class="prog-track"><div class="prog-fill" style="width:24%;background:#e6a817">Google CZ</div></div>
+        </div>
+        <div class="prog-wrap">
+          <div class="prog-label"><span>META SK</span><span style="font-weight:700">65 480 Kč (14,3 %)</span></div>
+          <div class="prog-track"><div class="prog-fill" style="width:14.3%;background:#7a3a6c">META SK</div></div>
+        </div>
+        <div class="prog-wrap">
+          <div class="prog-label"><span>Google SK</span><span style="font-weight:700">49 656 Kč (10,9 %)</span></div>
+          <div class="prog-track"><div class="prog-fill" style="width:10.9%;background:#f59e0b">Google SK</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEKLY TREND -->
+  <div class="section section-anchor" id="trend">
+    <div class="section-title">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      Týdenní trend výdajů — Google Ads CZ + SK (Q1 2026)
+    </div>
+    <div class="chart-container">
+      <svg id="weeklyChart" viewBox="0 0 860 320" width="100%" style="max-width:860px"></svg>
+    </div>
+    <div class="legend" id="weeklyLegend"></div>
+  </div>
+
+  <!-- CAMPAIGN TABLE -->
+  <div class="section section-anchor" id="campaigns">
+    <div class="section-title">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 10h18M3 14h18M10 3v18"/></svg>
+      Přehled kampaní — všechny platformy
+    </div>
+    <div style="overflow-x:auto">
+      <table class="data-table" id="campaignTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable(0)" style="text-align:left">Kampaň</th>
+            <th onclick="sortTable(1)">Platforma</th>
+            <th onclick="sortTable(2)">Výdaje (Kč)</th>
+            <th onclick="sortTable(3)">Konverze</th>
+            <th onclick="sortTable(4)">CPA (Kč)</th>
+            <th onclick="sortTable(5)">ROAS</th>
+            <th onclick="sortTable(6)">Stav</th>
+          </tr>
+        </thead>
+        <tbody id="campaignBody"></tbody>
+        <tfoot>
+          <tr>
+            <td>CELKEM</td>
+            <td>—</td>
+            <td>456 981</td>
+            <td>9 787</td>
+            <td>46,7</td>
+            <td>8,66×</td>
+            <td>—</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- GA4 ATTRIBUTION -->
+  <div class="section section-anchor" id="ga4">
+    <div class="section-title">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      GA4 Atribuce — Socials vs GA4 (reálná data)
+    </div>
+
+    <div style="padding:14px 18px;background:rgba(99,102,241,.07);border-radius:10px;border-left:4px solid #6366f1;margin-bottom:24px;font-size:13.5px;line-height:1.7">
+      <strong>Proč je toto srovnání důležité?</strong> Reklamní platformy (META, Google) počítají tržby vlastní atribucí — berou si zásluhu za každý nákup, kde uživatel kliknul na reklamu. GA4 používá model <em>last non-direct click</em> — přiřazuje konverzi poslednímu kanálu před nákupem (mimo přímý přístup). Výsledek: platformy typicky <strong>nadhodnocují svůj přínos 2–4×</strong>.<br>
+      <span style="color:var(--text-muted);font-size:12px">Poznámka: GA4 data jsou za období 1. 1. 2025 – 13. 4. 2026 (15,5 měsíců); výdaje na reklamy jsou za Q1 2026 (3 měsíce). Srovnání ROAS je orientační — slouží pro pochopení atribučního rozdílu.</span>
+    </div>
+
+    <!-- META vs Google GA4 cards -->
+    <div class="two-col" style="margin-bottom:28px">
+
+      <div class="ga4-platform-card">
+        <div class="ga4-card-header" style="background:linear-gradient(135deg,#5C2450,#7a3a6c)">
+          <div style="font-size:15px;font-weight:700">META Ads (Paid Social)</div>
+          <div style="font-size:11.5px;opacity:.8">CZ + SK &nbsp;·&nbsp; Q1 2026</div>
+        </div>
+        <div class="ga4-card-body">
+          <table style="width:100%;font-size:13px;border-collapse:collapse">
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:7px 0;color:var(--text-muted)">Spend Q1</td>
+              <td style="text-align:right;font-weight:700">297 668 Kč</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:7px 0;color:var(--text-muted)">META self-report tržby (Q1)</td>
+              <td style="text-align:right;font-weight:700;color:#22c55e">2 580 000 Kč</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:7px 0;color:var(--text-muted)">META self-report ROAS</td>
+              <td style="text-align:right;font-weight:700;color:#22c55e">8,66×</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:7px 0;color:var(--text-muted)">GA4 Paid Social tržby (15 měs.)</td>
+              <td style="text-align:right;font-weight:700">4 217 869 Kč</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:7px 0;color:var(--text-muted)">GA4 Paid Social — est. Q1</td>
+              <td style="text-align:right;font-weight:700;color:#f59e0b">~817 000 Kč</td>
+            </tr>
+            <tr>
+              <td style="padding:7px 0;color:var(--text-muted)">GA4 ROAS (est.)</td>
+              <td style="text-align:right;font-weight:700;color:#f59e0b">~2,7×</td>
+            </tr>
+          </table>
+          <div style="margin-top:12px;padding:10px 12px;background:rgba(245,158,11,.1);border-radius:8px;font-size:12.5px">
+            ⚠️ <strong>META nadhodnocuje ~3,2×</strong> oproti GA4 last-click. Část konverzí, které META připisuje sobě, zákazníci dokončují přes přímý vstup nebo organické vyhledávání.
+          </div>
+        </div>
+      </div>
+
+      <div class="ga4-platform-card">
+        <div class="ga4-card-header" style="background:linear-gradient(135deg,#e6a817,#f59e0b)">
+          <div style="font-size:15px;font-weight:700">Google Ads (Paid Search)</div>
+          <div style="font-size:11.5px;opacity:.8">CZ + SK &nbsp;·&nbsp; Q1 2026</div>
+        </div>
+        <div class="ga4-card-body">
+          <table style="width:100%;font-size:13px;border-collapse:collapse">
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:7px 0;color:var(--text-muted)">Spend Q1</td>
+              <td style="text-align:right;font-weight:700">159 313 Kč</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:7px 0;color:var(--text-muted)">Google CPA brand CZ</td>
+              <td style="text-align:right;font-weight:700;color:#22c55e">11,31 Kč</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:7px 0;color:var(--text-muted)">Google konverze Q1 (CZ)</td>
+              <td style="text-align:right;font-weight:700">7 915</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:7px 0;color:var(--text-muted)">GA4 Paid Search tržby (15 měs.)</td>
+              <td style="text-align:right;font-weight:700">61 787 240 Kč</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:7px 0;color:var(--text-muted)">GA4 Paid Search — est. Q1</td>
+              <td style="text-align:right;font-weight:700;color:#22c55e">~11 960 000 Kč</td>
+            </tr>
+            <tr>
+              <td style="padding:7px 0;color:var(--text-muted)">GA4 ROAS (est.)</td>
+              <td style="text-align:right;font-weight:700;color:#22c55e">~75×</td>
+            </tr>
+          </table>
+          <div style="margin-top:12px;padding:10px 12px;background:rgba(34,197,94,.1);border-radius:8px;font-size:12.5px">
+            ✅ <strong>Google (Paid Search) v GA4 dominuje</strong> — zachytává zákazníky, kteří Diamond Plus aktivně hledají. Vysoký ROAS (~75×) odráží dominanci brandových kampaní.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GA4 Full Traffic Acquisition Table -->
+    <div style="font-weight:700;font-size:15px;margin-bottom:14px">GA4 Traffic Acquisition — všechny kanály (1. 1. 2025 – 13. 4. 2026)</div>
+    <div style="overflow-x:auto">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="text-align:left">#</th>
+            <th style="text-align:left">Kanál</th>
+            <th>Návštěvy</th>
+            <th>Engaged</th>
+            <th>Eng. %</th>
+            <th>Key Events</th>
+            <th>Key Ev. Rate</th>
+            <th>Tržby (Kč)</th>
+            <th>Podíl tržeb</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td style="text-align:left;font-weight:600">Direct</td><td>613 238</td><td>431 595</td><td>70,38 %</td><td>558 784</td><td>19,88 %</td><td style="font-weight:700">53 892 469</td><td>26,66 %</td></tr>
+          <tr style="background:rgba(230,168,23,.04)"><td>2</td><td style="text-align:left;font-weight:600">Paid Search <span style="font-size:11px;opacity:.7">(Google)</span></td><td>609 233</td><td>472 917</td><td style="color:#22c55e">77,62 %</td><td>666 576</td><td style="color:#22c55e">23,57 %</td><td style="font-weight:700;color:#22c55e">61 787 240</td><td>30,57 %</td></tr>
+          <tr><td>3</td><td style="text-align:left;font-weight:600">Unassigned</td><td>316 719</td><td>213 876</td><td>67,53 %</td><td>283 086</td><td>18,35 %</td><td style="font-weight:700">25 314 854</td><td>12,52 %</td></tr>
+          <tr><td>4</td><td style="text-align:left;font-weight:600">Organic Search</td><td>282 680</td><td>226 917</td><td>80,27 %</td><td>220 954</td><td>15,76 %</td><td style="font-weight:700">21 323 737</td><td>10,55 %</td></tr>
+          <tr><td>5</td><td style="text-align:left;font-weight:600">Cross-network</td><td>224 801</td><td>166 523</td><td>74,08 %</td><td>218 361</td><td>19,87 %</td><td style="font-weight:700">21 110 994</td><td>10,44 %</td></tr>
+          <tr style="background:rgba(92,36,80,.04)"><td>6</td><td style="text-align:left;font-weight:600">Paid Social <span style="font-size:11px;opacity:.7">(META)</span></td><td>188 306</td><td>98 243</td><td style="color:#f59e0b">52,17 %</td><td>51 420</td><td style="color:#ef4444">6,80 %</td><td style="font-weight:700;color:#f59e0b">4 217 869</td><td>2,09 %</td></tr>
+          <tr><td>7</td><td style="text-align:left;font-weight:600">Organic Social</td><td>117 232</td><td>71 720</td><td>61,18 %</td><td>40 968</td><td>7,85 %</td><td style="font-weight:700">3 567 552</td><td>1,77 %</td></tr>
+          <tr><td>8</td><td style="text-align:left;font-weight:600">Email</td><td>77 692</td><td>60 445</td><td>77,80 %</td><td>67 480</td><td>19,94 %</td><td style="font-weight:700">5 741 218</td><td>2,84 %</td></tr>
+          <tr><td>9</td><td style="text-align:left;font-weight:600">Referral</td><td>67 371</td><td>49 430</td><td>73,37 %</td><td>46 358</td><td>14,91 %</td><td style="font-weight:700">4 046 613</td><td>2,00 %</td></tr>
+          <tr><td>10</td><td style="text-align:left;font-weight:600">Paid Other</td><td>9 719</td><td>2 723</td><td style="color:#ef4444">28,02 %</td><td>521</td><td style="color:#ef4444">1,29 %</td><td style="font-weight:700;color:#ef4444">32 298</td><td>0,02 %</td></tr>
+          <tr><td>11</td><td style="text-align:left;font-weight:600">Organic Shopping</td><td>6 269</td><td>4 546</td><td>72,52 %</td><td>5 486</td><td>19,51 %</td><td style="font-weight:700">502 087</td><td>0,25 %</td></tr>
+          <tr><td>12</td><td style="text-align:left;font-weight:600">Paid Shopping</td><td>4 954</td><td>4 080</td><td style="color:#22c55e">82,36 %</td><td>5 234</td><td>21,54 %</td><td style="font-weight:700">541 535</td><td>0,27 %</td></tr>
+          <tr><td>13</td><td style="text-align:left;font-weight:600">Organic Video</td><td>1 190</td><td>821</td><td>68,99 %</td><td>394</td><td>7,82 %</td><td style="font-weight:700">44 697</td><td>0,02 %</td></tr>
+          <tr><td>14</td><td style="text-align:left;font-weight:600">SMS</td><td>138</td><td>97</td><td>70,29 %</td><td>27</td><td>10,14 %</td><td style="font-weight:700">3 913</td><td>&lt;0,01 %</td></tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2" style="text-align:left">CELKEM</td>
+            <td>2 499 845</td>
+            <td>1 789 414</td>
+            <td>71,58 %</td>
+            <td>2 165 649</td>
+            <td>—</td>
+            <td style="font-weight:700">202 127 075</td>
+            <td>100 %</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- Key insights -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px">
+      <div style="padding:16px;background:var(--bg);border-radius:10px;border-left:4px solid #ef4444">
+        <div style="font-weight:700;margin-bottom:8px;font-size:14px">⚠️ Paid Social — nízká kvalita provozu</div>
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.7">
+          META Ads přivádí 188K návštěv (7,53 % celku), ale jen <strong style="color:var(--text)">52 % je engaged</strong> a key event rate je pouhých <strong style="color:var(--text)">6,8 %</strong>. GA4 last-click přiřazuje Paid Social pouze 2,09 % tržeb — výrazně méně, než META hlásí.
+        </div>
+      </div>
+      <div style="padding:16px;background:var(--bg);border-radius:10px;border-left:4px solid #22c55e">
+        <div style="font-weight:700;margin-bottom:8px;font-size:14px">✅ Paid Search — nejefektivnější kanál</div>
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.7">
+          Paid Search (Google) je v GA4 <strong style="color:var(--text)">největší zdroj tržeb (30,57 %)</strong> s vysokou engagement rate 77,62 % a key event rate 23,57 %. Hlavní motor jsou brandové kampaně.
+        </div>
+      </div>
+      <div style="padding:16px;background:var(--bg);border-radius:10px;border-left:4px solid #6366f1">
+        <div style="font-weight:700;margin-bottom:8px;font-size:14px">💡 Direct = 2. největší zdroj (26,66 %)</div>
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.7">
+          Direct traffic drží 26,66 % tržeb. Velká část jsou zákazníci, kteří viděli META reklamu dříve, ale nákup dokončili při přímé návštěvě — GA4 je přiřazuje do Direct, ne META. To je klíčový důvod, proč META vypadá v GA4 slabě.
+        </div>
+      </div>
+      <div style="padding:16px;background:var(--bg);border-radius:10px;border-left:4px solid #f59e0b">
+        <div style="font-weight:700;margin-bottom:8px;font-size:14px">📌 Doporučení: asistované konverze</div>
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.7">
+          META pravděpodobně <strong style="color:var(--text)">asistuje</strong> mnoha konverzím, i když je v GA4 "nezavírá". Pro objektivní pohled doporučujeme aktivovat v GA4 <strong style="color:var(--text)">Data-Driven Attribution model</strong> nebo sledovat assisted conversions report.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECOMMENDATIONS -->
+  <div class="section section-anchor" id="reco">
+    <div class="section-title">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+      Doporučení &amp; optimalizace
+    </div>
+    <div class="reco-grid">
+      <div class="reco-card positive">
+        <div class="reco-title">✅ META CZ — škálovat Eff_prosp_sales_static</div>
+        <div class="reco-text">ROAS 9,41× při spend 116 531 Kč a 770 konverzích. Nejvyšší absolutní výkon. Zvažte navýšení denního budgetu z 3 000 Kč na 4 000–5 000 Kč, výsledky podporují škálování.</div>
+      </div>
+      <div class="reco-card positive">
+        <div class="reco-title">✅ Google CZ Brand — udržet nízký CPA</div>
+        <div class="reco-text">CZ-SEA-Brand má CPA 11,31 Kč s 4 119 konverzemi. Výjimečný výkon — neomezovat budget. Brandové vyhledávání (tiande, kralovstvi tiande) tvoří základ levné akvizice.</div>
+      </div>
+      <div class="reco-card warning">
+        <div class="reco-title">⚠️ META SK — aktivovat spící kampaně</div>
+        <div class="reco-text">Z 24 SK kampaní je 20 neaktivních. Aktivní 4 kampaně ukazují ROAS 7,31× — dobrý základ. Zvažte oživení Eff_prosp_sales_dynamic (SK) s vyšším budgetem.</div>
+      </div>
+      <div class="reco-card warning">
+        <div class="reco-title">⚠️ Google SK — nastavit konverzní tracking</div>
+        <div class="reco-text">SK Google kampaně nemají sledované konverze. Nastavit Google Ads konverze pro SK e-shop je priorita pro měření skutečného ROAS.</div>
+      </div>
+      <div class="reco-card info">
+        <div class="reco-title">💡 Cílení — ženy 35–54 let, mobilní</div>
+        <div class="reco-text">93 % publika tvoří ženy, dominantní věk 35–54 let (58 %). Mobilní zařízení = 72 % výdajů. Ujistěte se, že kreativy a landing pages jsou optimalizovány pro mobil.</div>
+      </div>
+      <div class="reco-card info">
+        <div class="reco-title">💡 Spend je pouze 0,89 % obratu</div>
+        <div class="reco-text">Extrémně efektivní poměr. Průměr e-commerce je 5–15 %. Existuje prostor pro navýšení celkového budgetu při zachování ziskovosti — ROAS 8,66× je vysoce nadprůměrný.</div>
+      </div>
+      <div class="reco-card positive">
+        <div class="reco-title">✅ Google CZ PMax — testovat navýšení</div>
+        <div class="reco-text">CZ-Pmax-Kategorie: CPA 13,43 Kč s 3 445 konverzemi. Velmi silný výkon. PMax kampaně automaticky optimalizují — při navýšení budgetu by měly dále škálovat.</div>
+      </div>
+      <div class="reco-card warning">
+        <div class="reco-title">⚠️ META ROAS nadhodnocen ~3,2×</div>
+        <div class="reco-text">META self-report ROAS 8,66× vs. GA4 atribuce ~2,7×. Board by měl zvážit přesun části reklamního budgetu z META ve prospěch Google Ads, kde GA4 ROAS dosahuje ~75×.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    Diamond Plus s.r.o. &nbsp;·&nbsp; Království TianDe &nbsp;·&nbsp; Marketing Dashboard &nbsp;·&nbsp; Generováno 14. dubna 2026
+  </div>
+
+</main>
+
+<script>
+// ---- DATA ----
+const campaigns = [
+  // META CZ
+  {name:'Eff_prosp_sales_static',platform:'META CZ',spend:116530.55,conv:770,cpa:151.34,roas:9.41,status:'active'},
+  {name:'Eff_prosp_sales_dynamic',platform:'META CZ',spend:85552.88,conv:585,cpa:146.24,roas:8.87,status:'active'},
+  {name:'Eff_rem_sales_dynamic',platform:'META CZ',spend:22682.34,conv:211,cpa:107.50,roas:13.28,status:'active'},
+  {name:'Eff_rem_sales_dynamic_custom',platform:'META CZ',spend:7422.22,conv:42,cpa:176.72,roas:8.24,status:'active'},
+  // META SK
+  {name:'Eff_prosp_sales_static',platform:'META SK',spend:21014.65,conv:127,cpa:165.47,roas:8.34,status:'active'},
+  {name:'Eff_prosp_sales_dynamic',platform:'META SK',spend:18581.16,conv:71,cpa:261.71,roas:5.15,status:'active'},
+  {name:'[F]_[CONVERSION]_2025_Katalog',platform:'META SK',spend:12371.94,conv:12321,cpa:1.00,roas:null,status:'active'},
+  {name:'Eff_rem_sales_dynamic',platform:'META SK',spend:7291.97,conv:46,cpa:158.52,roas:8.91,status:'active'},
+  {name:'Eff_Prosp_Leads_StaženíBrožury',platform:'META SK',spend:3367.75,conv:84,cpa:40.09,roas:null,status:'active'},
+  {name:'Eff_prosp_sales_static_MDŽ',platform:'META SK',spend:2612.11,conv:20,cpa:130.61,roas:9.99,status:'completed'},
+  {name:'Eff_Prosp_Leads_Kviz',platform:'META SK',spend:240.15,conv:1,cpa:240.15,roas:null,status:'active'},
+  // Google CZ
+  {name:'CZ-SEA-Brand-kralovstvi-tiande',platform:'Google CZ',spend:46581.99,conv:4119.31,cpa:11.31,roas:null,status:'active'},
+  {name:'CZ-Pmax-Kategorie-tianDe',platform:'Google CZ',spend:46258.51,conv:3445.30,cpa:13.43,roas:null,status:'active'},
+  {name:'CZ-PMax-Naked',platform:'Google CZ',spend:11284.98,conv:266.51,cpa:42.34,roas:null,status:'active'},
+  {name:'CZ-SEA-Competitors',platform:'Google CZ',spend:5414.23,conv:80.50,cpa:67.26,roas:null,status:'active'},
+  {name:'CZ-Shopping-low-cpc',platform:'Google CZ',spend:117.39,conv:2.00,cpa:58.70,roas:null,status:'active'},
+  // Google SK
+  {name:'SK-Pmax-Kategorie-tianDe',platform:'Google SK',spend:31283.35,conv:null,cpa:null,roas:null,status:'active'},
+  {name:'SK-Brand-kralovstvi-tiande',platform:'Google SK',spend:11712.54,conv:null,cpa:null,roas:null,status:'active'},
+  {name:'SK-PMax-Naked',platform:'Google SK',spend:4021.98,conv:null,cpa:null,roas:null,status:'active'},
+  {name:'SK-SEA-Competitors',platform:'Google SK',spend:2638.19,conv:null,cpa:null,roas:null,status:'active'},
+];
+
+const weekLabels = ['W01','W02','W03','W04','W05','W06','W07','W08','W09','W10','W11','W12','W13'];
+const spendCZ = [7155.62,6927.33,6667.06,6758.41,7683.32,7935.70,7504.13,11885.97,12578.28,10149.78,8032.86,9330.57,3003.28];
+const spendSK = [3480.98,3200.77,3122.12,3054.49,3650.49,3713.67,3531.42,5004.97,5915.06,5264.54,3592.88,3277.80,1031.15];
+
+// ---- THEME ----
+function toggleTheme() {
+  const d = document.documentElement;
+  const isDark = d.getAttribute('data-theme') === 'dark';
+  d.setAttribute('data-theme', isDark ? '' : 'dark');
+  document.querySelector('.theme-toggle').textContent = isDark ? '🌙 Tmavý režim' : '☀️ Světlý režim';
+  drawAll();
+}
+
+// ---- CAMPAIGNS TABLE ----
+let sortCol = 2, sortDir = -1;
+function renderCampaigns() {
+  const platformColors = {'META CZ':'purple','META SK':'blue','Google CZ':'gold','Google SK':'green'};
+  const sorted = [...campaigns].sort((a,b) => {
+    const keys = ['name','platform','spend','conv','cpa','roas','status'];
+    const av = a[keys[sortCol]] ?? -Infinity;
+    const bv = b[keys[sortCol]] ?? -Infinity;
+    return av < bv ? sortDir : av > bv ? -sortDir : 0;
+  });
+  document.getElementById('campaignBody').innerHTML = sorted.map(c => `
+    <tr>
+      <td>${c.name}</td>
+      <td><span class="badge badge-${platformColors[c.platform]||'gray'}">${c.platform}</span></td>
+      <td>${c.spend.toLocaleString('cs',{maximumFractionDigits:0})}</td>
+      <td>${c.conv != null ? (typeof c.conv === 'number' ? c.conv.toLocaleString('cs',{maximumFractionDigits:0}) : c.conv) : '—'}</td>
+      <td>${c.cpa != null ? c.cpa.toFixed(2) : '—'}</td>
+      <td>${c.roas != null ? c.roas.toFixed(2)+'×' : '—'}</td>
+      <td><span class="badge badge-${c.status==='active'?'green':c.status==='completed'?'blue':'gray'}">${c.status==='active'?'Aktivní':c.status==='completed'?'Dokončeno':'Neaktivní'}</span></td>
+    </tr>
+  `).join('');
+  document.querySelectorAll('#campaignTable thead th').forEach((th,i) => {
+    th.classList.remove('sort-asc','sort-desc');
+    if(i===sortCol) th.classList.add(sortDir===1?'sort-asc':'sort-desc');
+  });
+}
+function sortTable(col) {
+  if(sortCol===col) sortDir *= -1;
+  else { sortCol=col; sortDir=-1; }
+  renderCampaigns();
+}
+
+// ---- HELPERS ----
+function getTextColor() {
+  return document.documentElement.getAttribute('data-theme')==='dark' ? '#9ca3af' : '#6b7280';
+}
+function getGridColor() {
+  return document.documentElement.getAttribute('data-theme')==='dark' ? '#2d2f3a' : '#e5e7eb';
+}
+
+// ---- DONUT CHART ----
+function drawDonut(svgId, data, colors, total) {
+  const svg = document.getElementById(svgId);
+  if(!svg) return;
+  const cx=90, cy=90, R=70, r=40;
+  let angle = -Math.PI/2;
+  let html = '';
+  data.forEach((d,i) => {
+    const sweep = (d/total)*2*Math.PI;
+    const x1=cx+R*Math.cos(angle), y1=cy+R*Math.sin(angle);
+    const x2=cx+R*Math.cos(angle+sweep), y2=cy+R*Math.sin(angle+sweep);
+    const xi1=cx+r*Math.cos(angle), yi1=cy+r*Math.sin(angle);
+    const xi2=cx+r*Math.cos(angle+sweep), yi2=cy+r*Math.sin(angle+sweep);
+    const lg = sweep>Math.PI?1:0;
+    html += `<path d="M${x1.toFixed(2)},${y1.toFixed(2)} A${R},${R} 0 ${lg} 1 ${x2.toFixed(2)},${y2.toFixed(2)} L${xi2.toFixed(2)},${yi2.toFixed(2)} A${r},${r} 0 ${lg} 0 ${xi1.toFixed(2)},${yi1.toFixed(2)} Z" fill="${colors[i]}"><title>${(d/total*100).toFixed(1)}%</title></path>`;
+    angle += sweep;
+  });
+  const tc = getTextColor();
+  html += `<text x="${cx}" y="${cy-6}" text-anchor="middle" fill="${tc}" font-size="14" font-weight="800">${(data[0]/total*100).toFixed(0)}%</text>`;
+  html += `<text x="${cx}" y="${cy+12}" text-anchor="middle" fill="${tc}" font-size="10">META</text>`;
+  svg.innerHTML = html;
+}
+
+// ---- WEEKLY TREND CHART ----
+function drawWeeklyChart() {
+  const svg = document.getElementById('weeklyChart');
+  if(!svg) return;
+  const W=860, H=320, pad={t:24,r:24,b:60,l:68};
+  const cW=W-pad.l-pad.r, cH=H-pad.t-pad.b;
+  const maxSpend=Math.max(...spendCZ.map((v,i)=>v+spendSK[i]))*1.18;
+  const gap=cW/weekLabels.length;
+  const barW=gap*0.35;
+  const tc=getTextColor(), gc=getGridColor();
+  let html='';
+  for(let i=0;i<=4;i++){
+    const y=pad.t+cH-(cH*i/4);
+    const v=Math.round(maxSpend*i/4);
+    html+=`<line x1="${pad.l}" y1="${y.toFixed(1)}" x2="${W-pad.r}" y2="${y.toFixed(1)}" stroke="${gc}" stroke-width="1"/>`;
+    html+=`<text x="${pad.l-8}" y="${(y+4).toFixed(1)}" text-anchor="end" fill="${tc}" font-size="11">${(v/1000).toFixed(0)}K</text>`;
+  }
+  spendCZ.forEach((czV,i)=>{
+    const skV=spendSK[i];
+    const x=pad.l+i*gap+gap/2-barW;
+    const hCZ=(czV/maxSpend)*cH;
+    const hSK=(skV/maxSpend)*cH;
+    html+=`<rect x="${x.toFixed(1)}" y="${(pad.t+cH-hCZ).toFixed(1)}" width="${barW.toFixed(1)}" height="${hCZ.toFixed(1)}" fill="#5C2450" rx="3"><title>Google CZ W${i+1}: ${czV.toFixed(0)} Kč</title></rect>`;
+    html+=`<rect x="${(x+barW+2).toFixed(1)}" y="${(pad.t+cH-hSK).toFixed(1)}" width="${barW.toFixed(1)}" height="${hSK.toFixed(1)}" fill="#e6a817" rx="3"><title>Google SK W${i+1}: ${skV.toFixed(0)} Kč</title></rect>`;
+    html+=`<text x="${(x+barW).toFixed(1)}" y="${H-pad.b+18}" text-anchor="middle" fill="${tc}" font-size="10.5">${weekLabels[i]}</text>`;
+  });
+  svg.innerHTML=html;
+  document.getElementById('weeklyLegend').innerHTML=`
+    <div class="legend-item"><div class="legend-dot" style="background:#5C2450"></div>Google CZ (týdenní výdaje)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#e6a817"></div>Google SK (týdenní výdaje)</div>
+  `;
+}
+
+function drawAll() {
+  drawDonut('donutMeta',[297668,159313],['#5C2450','#e6a817'],456981);
+  drawWeeklyChart();
+}
+
+// ---- ACTIVE NAV ----
+function updateNav() {
+  const sections = ['kpi','spend','trend','campaigns','ga4','reco'];
+  let current = sections[0];
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if(el && window.scrollY >= el.offsetTop - 130) current = id;
+  });
+  document.querySelectorAll('.topnav-links a').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href')==='#'+current);
+  });
+}
+
+window.addEventListener('scroll', updateNav, {passive:true});
+
+// ---- INIT ----
+renderCampaigns();
+drawAll();
+window.addEventListener('resize', drawAll);
+</script>
+</body>
+</html>
